@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pemilihan Ketua Takmir - Masjid Fatkhur Rohman 2026</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui,Arial,sans-serif}
+body{margin:0;background:#f1f5f9;color:#0f172a}
+header{background:#0f766e;color:#fff;padding:24px 16px;text-align:center}
+header h1{margin:0;font-size:22px}
+header p{margin:6px 0 0;opacity:.9}
+.wrap{max-width:720px;margin:auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+h2{margin:0 0 12px;font-size:18px}
+input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px}
+button{border:0;border-radius:10px;padding:12px 14px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-green{background:#0f766e;color:#fff;width:100%;margin-top:10px}
+.btn-red{background:#fee2e2;color:#dc2626}
+.btn-vote{background:#0f766e;color:#fff;flex:1}
+.calon{display:flex;gap:10px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:10px}
+.calon b{flex:1;font-size:16px}
+.calon small{display:block;color:#64748b;font-weight:400}
+.bar{height:10px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:#0f766e}
+.flex{display:flex;gap:8px}
+.center{text-align:center;color:#64748b;font-size:13px;margin-top:12px}
+</style>
+</head>
+<body>
+<header>
+<h1>🕌 Masjid Fatkhur Rohman 2026</h1>
+<p>Panitia Pemilihan Ketua Takmir Masjid</p>
+<p style="font-size:13px;margin-top:10px;background:rgba(255,255,255,.2);display:inline-block;padding:6px 12px;border-radius:99px" id="totalSuara">Total Suara: 0</p>
+</header>
+<div class="wrap">
+<div class="card">
+<h2>➕ Tambah Calon Ketua Takmir</h2>
+<input id="namaCalon" placeholder="Nama calon, contoh: H. Ahmad">
+<button class="btn-green" onclick="tambahCalon()">Tambah Calon</button>
+</div>
+<div class="card">
+<h2>🗳️ Daftar Calon - Klik Pilih Untuk Vote</h2>
+<div id="listCalon"></div>
+<div class="flex" style="margin-top:14px">
+<button class="btn-red" style="flex:1" onclick="resetSemua()">Reset Semua Suara</button>
+</div>
+</div>
+<div class="card">
+<h2>📊 Hasil Sementara</h2>
+<div id="hasil"></div>
+</div>
+<p class="center">Website Resmi Panitia • Masjid Fatkhur Rohman • 2026<br>1 HP = 1 Suara, Mohon Amanah</p>
+</div>
+<script>
+let data = JSON.parse(localStorage.getItem('masjid2026') || '[]');
+if(data.length===0){ data=[{nama:'Calon 1',suara:0},{nama:'Calon 2',suara:0}]; simpan(); }
+function simpan(){ localStorage.setItem('masjid2026', JSON.stringify(data)); tampil(); }
+function tampil(){
+  let total = data.reduce((a,b)=>a+b.suara,0);
+  document.getElementById('totalSuara').innerText = 'Total Suara: '+total;
+  document.getElementById('listCalon').innerHTML = data.map((c,i)=>`
+    <div class="calon"><b>${c.nama}<small>${c.suara} suara</small></b>
+    <button class="btn-vote" onclick="vote(${i})">PILIH ✅</button>
+    <button class="btn-red" onclick="hapus(${i})">✕</button></div>`).join('');
+  let max = Math.max(...data.map(c=>c.suara),1);
+  document.getElementById('hasil').innerHTML = data.map(c=>`
+    <div style="margin-bottom:12px"><b>${c.nama}</b> - ${c.suara} suara (${total?Math.round(c.suara/total*100):0}%)
+    <div class="bar"><i style="width:${c.suara/max*100}%"></i></div></div>`).join('');
+}
+function tambahCalon(){
+  let v=document.getElementById('namaCalon').value.trim();
+  if(!v) return alert('Isi nama calon dulu');
+  data.push({nama:v,suara:0}); document.getElementById('namaCalon').value=''; simpan();
+}
+function vote(i){ data[i].suara++; simpan(); alert('Terima kasih, suara untuk '+data[i].nama+' tercatat!'); }
+function hapus(i){ if(confirm('Hapus '+data[i].nama+'?')){ data.splice(i,1); simpan(); } }
+function resetSemua(){ if(confirm('Reset semua suara jadi 0?')){ data.forEach(c=>c.suara=0); simpan(); } }
+tampil();
+</script>
+</body>
+</html>
